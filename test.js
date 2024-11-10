@@ -1,6 +1,6 @@
 // Configuration
 const OCTOPRINT_URL = 'http://localhost:5000';
-const API_KEY = 'BQ0yyy6FZNm-PSNtyIogHZIjNUL3Zup01fwc838NR6c';
+const API_KEY = '4F4A25BB923147378E9E96D30E425D13';
 
 const headers = {
     'X-Api-Key': API_KEY,
@@ -30,7 +30,8 @@ async function cancelPrint() {
                 command: "cancel"
             })
         });
-        return await response.json();
+        console.log("Cancelled")
+        // return await response.json();
     } catch (error) {
         console.error('Error cancelling print:', error);
     }
@@ -175,7 +176,9 @@ async function startPrint(filename) {
 
 
 async function runTests() {
-    await getPrinterState()
+    await setToolTemperature(300)
+
+
 }
 
 runTests();
