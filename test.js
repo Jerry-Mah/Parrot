@@ -176,7 +176,8 @@ async function startPrint(filename) {
 
 
 async function runTests() {
-    await setToolTemperature(300)
+    const res = await getJobStatus()
+    console.log(res)
 
 
 }

@@ -7,8 +7,14 @@ import { FaTemperatureHigh } from "react-icons/fa";
 
 import { FaFile } from "react-icons/fa";
 import { useState } from "react";
+import {useCurrentPrinterStateQuery, useCurrentJobStateQuery} from '../services/PrinterStatusAPI'
 
 const Home = () => {
+  const {data:printerData,isfetching:printerFetching} = useCurrentPrinterStateQuery()
+  const {data:jobData, isfetching:jobFetching} = useCurrentJobStateQuery()
+
+  // console.log(printerData)
+  // console.log(jobData)
   const [pageOne, setPageOne] = useState(false);
   const [pageTwo, setPageTwo] = useState(true);
 
