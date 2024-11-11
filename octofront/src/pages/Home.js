@@ -6,118 +6,127 @@ import { HiOutlineStatusOnline } from "react-icons/hi";
 import { FaTemperatureHigh } from "react-icons/fa";
 
 import { FaFile } from "react-icons/fa";
-import { useState } from "react";
-import {useCurrentPrinterStateQuery, useCurrentJobStateQuery} from '../services/PrinterStatusAPI'
+import { useState, useEffect } from "react";
+import {
+  useCurrentPrinterStateQuery,
+  useCurrentJobStateQuery,
+} from "../services/PrinterStatusAPI";
+
+import { useDispatch } from "react-redux";
+import { setReady } from "../services/PrinterSlice";
 
 const Home = () => {
-  const {data:printerData,isfetching:printerFetching} = useCurrentPrinterStateQuery()
-  const {data:jobData, isfetching:jobFetching} = useCurrentJobStateQuery()
+  const { data: printerData, isfetching: printerFetching } =useCurrentPrinterStateQuery();
+  const { data: jobData, isfetching: jobFetching } = useCurrentJobStateQuery();
 
-  // console.log(printerData)
-  // console.log(jobData)
-  const [pageOne, setPageOne] = useState(false);
-  const [pageTwo, setPageTwo] = useState(true);
+  const [bedTemperatureActual, setBedTemperatureActual] = useState(null);
+  const [tool0TemperatureActual, setTool0TemperatureActual] = useState(null);
+  const [estimatedPrintTime, setEstimatedPrintTime] = useState(null);
+  const [fileName, setFileName] = useState(null);
+  const [state, setState] = useState(null);
+  const [completion, setCompletion] = useState(null);
 
-  const pageSwitchHandler = () => {
-    setPageOne(!pageOne);
-    setPageTwo(!pageTwo);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (!printerFetching && printerData) {
+      const ready = printerData.state.flags.ready;
+      dispatch(setReady(ready)); // Dispatch ready to Redux store
+    }
+  }, [printerFetching, printerData, dispatch]);
+
+
+  const formatTime = (seconds) => {
+    if (!seconds) return "N/A";
+    const hrs = Math.floor(seconds / 3600)
+      .toString()
+      .padStart(2, "0");
+    const mins = Math.floor((seconds % 3600) / 60)
+      .toString()
+      .padStart(2, "0");
+    const secs = (seconds % 60).toString().padStart(2, "0");
+    return `${hrs}:${mins}:${secs}`;
   };
+
+  const convertToPercentage = (decimalValue) => {
+    return (decimalValue * 100).toFixed(2) + '%';
+  };
+  
+
+  useEffect(() => {
+    // Set initial values when component mounts
+    setBedTemperatureActual(printerData?.temperature?.bed?.actual || "N/A");
+    setTool0TemperatureActual(printerData?.temperature?.tool0?.actual || "N/A");
+    
+    setEstimatedPrintTime(jobData?.progress?.printTimeLeft);
+    setFileName(jobData?.job?.file?.name || "N/A");
+    setState(jobData?.state || "N/A");
+    setCompletion(convertToPercentage(jobData?.progress?.completion))
+
+    // Cleanup function to reset values on unmount
+    return () => {
+      setBedTemperatureActual(null);
+      setTool0TemperatureActual(null);
+      setEstimatedPrintTime(null);
+      setFileName(null);
+      setState(null);
+    };
+  }, [printerData, jobData]);
+
+ 
 
   return (
     <>
-      {pageOne && (
-        <div class="grid grid-cols-2 gap-4">
-          <Card className="text-white flex justify-between p-8">
-            <div className="flex items-center gap-2">
-              <CiTimer size={50} />
-              <h1 className="text-xl">Estimated Completion Time</h1>
-            </div>
+      <div class="grid grid-cols-2 gap-4">
+        <Card className="text-white flex justify-between p-8">
+          <div className="flex items-center gap-2">
+            <CiTimer size={50} />
+            <h1 className="text-xl">Estimated Completion Time</h1>
+          </div>
 
-            <h1 className="text-[40px] font-bold">23:30</h1>
-          </Card>
-          <Card className="text-white flex justify-between p-8">
-            <div className="flex items-center gap-2">
-              <IoLayersOutline size={50} />
-              <h1 className="text-3xl">Layer</h1>
-            </div>
+          <h1 className="text-[40px] font-bold">
+            {estimatedPrintTime == null ? "0" : formatTime(estimatedPrintTime)}
+          </h1>
+        </Card>
+        <Card className="text-white flex justify-between p-8">
+          <div className="flex items-center gap-2">
+            <IoLayersOutline size={50} />
+            <h1 className="text-3xl">Percentage</h1>
+          </div>
 
-            <h1 className="text-[40px] font-bold">200/999</h1>
-          </Card>
-          <Card className="text-white flex justify-between p-8">
-            <div className="flex items-center gap-2">
-              <HiOutlineStatusOnline size={50} />
-              <h1 className="text-3xl">Status</h1>
-            </div>
+          <h1 className="text-[40px] font-bold">{completion}</h1>
+        </Card>
+        <Card className="text-white flex justify-between p-8">
+          <div className="flex items-center gap-2">
+            <HiOutlineStatusOnline size={50} />
+            <h1 className="text-3xl">State:</h1>
+          </div>
 
-            <h1 className="text-[32px] font-bold">Connected</h1>
-          </Card>
-          <Card className="text-white flex justify-center p-8">
-            <div className="flex items-center gap-2">
-              <FaFile size={50} />
-              <h1 className="text-xl">currentprint_name.gcode </h1>
-            </div>
-          </Card>
+          <h1 className="text-[32px] font-bold">{state}</h1>
+        </Card>
+        <Card className="text-white flex justify-center p-8">
+          <div className="flex items-center gap-2">
+            <FaFile size={50} />
+            <h1 className="text-xl">{fileName}</h1>
+          </div>
+        </Card>
 
-          <Card className="text-white flex justify-between p-8">
-            <div className="flex items-center gap-2">
-              <FaTemperatureHigh size={50} />
-              <h1 className="text-xl">Build Plate Temperatures</h1>
-            </div>
+        <Card className="text-white flex justify-between p-8">
+          <div className="flex items-center gap-2">
+            <FaTemperatureHigh size={50} />
+            <h1 className="text-xl">Build Plate Temperatures</h1>
+          </div>
 
-            <h1 className="text-[40px] font-bold">110*C</h1>
-          </Card>
-          <Card className="text-white flex justify-between p-8">
-            <div className="flex items-center gap-2">
-              <FaTemperatureHigh size={50} />
-              <h1 className="text-xl">Build Plate Temperature</h1>
-            </div>
+          <h1 className="text-[40px] font-bold">{bedTemperatureActual}℃</h1>
+        </Card>
+        <Card className="text-white flex justify-between p-8">
+          <div className="flex items-center gap-2">
+            <FaTemperatureHigh size={50} />
+            <h1 className="text-xl">Tool Temperature</h1>
+          </div>
 
-            <h1 className="text-[40px] font-bold">110*C</h1>
-          </Card>
-        </div>
-      )}
-      {pageTwo && (
-        <div class="grid grid-cols-2 gap-4">
-          <Card className="text-white flex justify-between p-8">
-            <div className="flex items-center gap-2">
-              <CiTimer size={50} />
-              <h1 className="text-xl">Estimated Completion Time</h1>
-            </div>
-
-            <h1 className="text-[40px] font-bold">23:30</h1>
-          </Card>
-          <Card className="text-white flex justify-between p-8">
-            <div className="flex items-center gap-2">
-              <IoLayersOutline size={50} />
-              <h1 className="text-3xl">Layer</h1>
-            </div>
-
-            <h1 className="text-[40px] font-bold">200/999</h1>
-          </Card>
-        </div>
-      )}
-      <button
-        type="button"
-        onClick={pageSwitchHandler}
-        class="fixed bottom-8 right-[540px] text-white w-32 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex justify-center items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-      >
-        Next
-        <svg
-          class="rtl:rotate-180 w-3.5 h-3.5 ms-2"
-          aria-hidden="true"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 14 10"
-        >
-          <path
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M1 5h12m0 0L9 1m4 4L9 9"
-          />
-        </svg>
-      </button>
+          <h1 className="text-[40px] font-bold">{tool0TemperatureActual}℃</h1>
+        </Card>
+      </div>
     </>
   );
 };

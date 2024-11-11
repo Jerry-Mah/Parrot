@@ -4,10 +4,11 @@ import Home from './pages/Home'
 import CameraFeed from './pages/CameraFeed'
 import PrinterControl from './pages/PrinterControl'
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-
+import { Toaster } from 'sonner';
 const App = () => {
   return (
     <BrowserRouter>
+     <Toaster />
       <Routes>
        <Route path = "/" element ={<Layout/>}>
        <Route index element={<Home />} />

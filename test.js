@@ -1,13 +1,24 @@
 // Configuration
-const OCTOPRINT_URL = 'http://localhost:5000';
-const API_KEY = '4F4A25BB923147378E9E96D30E425D13';
+import { SerialPort } from "serialport";
 
-const headers = {
-    'X-Api-Key': API_KEY,
-    'Content-Type': 'application/json'
-};
+
+// const OCTOPRINT_URL = 'http://localhost:5000';
+// const API_KEY = '4F4A25BB923147378E9E96D30E425D13';
+
+// const headers = {
+//     'X-Api-Key': API_KEY,
+//     'Content-Type': 'application/json'
+// };
 
 // printer status 
+const serialPortName = 'COM7';
+const serialport = new SerialPort({ path: serialPortName, baudRate: 9600 });
+
+async function clearPrintBed() {
+    console.log("Clear plate command received");
+    serialport.write('1\n');
+  }
+  
 async function getPrinterState() {
     try {
         const response = await fetch(`${OCTOPRINT_URL}/api/printer`, {
@@ -137,8 +148,6 @@ async function getFiles() {
 
 
 
-// after above api's have been established
-// Upload a file
 async function uploadFile(file) {
     try {
         const formData = new FormData();
@@ -176,8 +185,7 @@ async function startPrint(filename) {
 
 
 async function runTests() {
-    const res = await getJobStatus()
-    console.log(res)
+    clearPrintBed()
 
 
 }

@@ -8,7 +8,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Load YOLOv8 model
-model = YOLO("yolov8n.pt")  # Replace with 'yolov8s.pt', 'yolov8m.pt', etc., if needed
+model = YOLO("best.pt")  # Replace with 'yolov8s.pt', 'yolov8m.pt', etc., if needed
 
 # Initialize Socket.IO client
 sio = socketio.Client(logger=True, engineio_logger=True)
@@ -36,7 +36,9 @@ while cap.isOpened():
     results = model(frame)
 
     # Check for 'person' class detections (class ID 0)
-    found_person = any(detection.cls == 0 for detection in results[0].boxes)
+    found_person = any(detection.cls == 1. for detection in results[0].boxes)
+    for detection in results[0].boxes:
+        print(detection)
 
     # Get current time
     current_time = time.time()
@@ -46,7 +48,7 @@ while cap.isOpened():
         print("Found")
 
         # Ask user if they want to stop
-        user_input = input("Face detected. Do you want to stop the webcam? (yes/no): ").strip().lower()
+        user_input = input("Fault detected. Do you want to stop the webcam? (yes/no): ").strip().lower()
         
         if user_input == "yes":
             print("Stopping webcam...")

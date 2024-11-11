@@ -6,6 +6,8 @@ import { FaPause } from "react-icons/fa";
 import { MdOutlineNotStarted } from "react-icons/md";
 import { FaTemperatureLow } from "react-icons/fa";
 import axios from "axios";
+import { toast } from 'sonner';
+
 
 const OCTOPRINT_URL = "http://localhost:5000";
 const API_KEY = "4F4A25BB923147378E9E96D30E425D13";
@@ -28,7 +30,7 @@ async function startPrint(filename) {
         }),
       }
     );
-    return await response.json();
+    toast.success('Print Started!');
   } catch (error) {
     console.error("Error starting print:", error);
   }
@@ -43,17 +45,14 @@ async function cancelPrint() {
         command: "cancel",
       }),
     });
-    console.log("Canceled");
-    return await response.json();
+    toast.success('Print Cancelled');
   } catch (error) {
     console.error("Error cancelling print:", error);
   }
 }
 async function pauseResumePrint(action) {
   try {
-    // Log the action to confirm it's being passed correctly
-    console.log("Sending action:", action);
-
+  
     const response = await fetch(`${OCTOPRINT_URL}/api/job`, {
       method: "POST",
       headers: headers,
@@ -65,7 +64,7 @@ async function pauseResumePrint(action) {
     // Check if the response is okay
     if (response.ok) {
       const data = await response.json();
-      console.log("Response data:", data);
+      toast.success('Print Paused!');
       return data;
     } else {
       const errorData = await response.json();
@@ -118,11 +117,10 @@ const PrinterControl = () => {
     // Log the current values
     console.log("Bed Temperature:", bedTemp);
     console.log("Tool Temperature:", toolTemp);
-
     
     await setToolTemperature(parseInt(toolTemp, 10)); 
     await setBedTemperature(parseInt(bedTemp,10));
-
+    toast.success('Temperature has been set!');
     // Reset state values after async operation completes
     setBedTemp('');
     setToolTemp('');
@@ -132,6 +130,7 @@ const PrinterControl = () => {
 };
   return (
     <>
+    {/* <Toast/> */}
       <div class="grid grid-cols-2 gap-4 center">
         <Button
           onClick={() => cancelPrint()}

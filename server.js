@@ -16,13 +16,19 @@ const io = new Server(server, {
 });
 
 // Port info
-// const serialPortName = '/dev/ttyUSB0';
-// const serialport = new SerialPort({ path: serialPortName, baudRate: 9600 });
+const serialPortName = 'COM7';
+const serialport = new SerialPort({ path: serialPortName, baudRate: 9600 });
 
 // Configuration
 const OCTOPRINT_CONFIG = {
   url: process.env.VITE_API_URL_OCTOPRINT,
   apiKey: process.env.VITE_API_KEY_OCTOPRINT,
+};
+
+
+const headers = {
+  "X-Api-Key": OCTOPRINT_CONFIG.apiKey,
+  "Content-Type": "application/json",
 };
 
 // Printer state management (future use)
@@ -47,8 +53,9 @@ io.on("connection", (socket) => {
       console.log("Print stopped successfully");
 
       // Command robot to clear bed
-      console.log("bed clearing started");
       clearPrintBed();
+      console.log("bed clearing started");
+      
     } catch (error) {
       console.error("Error handling fault:", error);
     }
@@ -58,7 +65,7 @@ io.on("connection", (socket) => {
   socket.on("print_complete", async () => {
     console.log("Print complete");
     try {
-      clearPrintBed();
+      clearPrintBedCompletedPrint();
     } catch (error) {
       console.error("Error handling print completion:", error);
     }
@@ -74,14 +81,12 @@ async function cancelPrint() {
   try {
     const response = await fetch(`${OCTOPRINT_CONFIG.url}/api/job`, {
       method: "POST",
-      headers: {
-        "X-Api-Key": OCTOPRINT_CONFIG.apiKey,
-        "Content-Type": "application/json",
-      },
+      headers: headers,
       body: JSON.stringify({
         command: "cancel",
       }),
     });
+    console.log("Canceled");
     return await response.json();
   } catch (error) {
     console.error("Error cancelling print:", error);
@@ -89,9 +94,14 @@ async function cancelPrint() {
 }
 
 // Robot control functions
-async function clearPrintBed(status) {
+async function clearPrintBed() {
   console.log("Clear plate command received");
-  // serialport.write('1\n');
+  serialport.write('1\n');
+}
+
+async function clearPrintBedCompletedPrint(status) {
+  console.log("Clear plate command received");
+  serialport.write('2\n');
 }
 
 // Error handling middleware
