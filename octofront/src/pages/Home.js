@@ -17,11 +17,11 @@ import { setReady } from "../services/PrinterSlice";
 
 const Home = () => {
   const { data: printerData, isFetching: printerFetching } = useCurrentPrinterStateQuery(undefined, {
-    pollingInterval: 3000, // Poll every 5 seconds
+    pollingInterval: 3000, 
   });
   
   const { data: jobData, isFetching: jobFetching } = useCurrentJobStateQuery(undefined, {
-    pollingInterval: 3000, // Poll every 5 seconds
+    pollingInterval: 3000, 
   });
 
   const [bedTemperatureActual, setBedTemperatureActual] = useState(null);
@@ -31,7 +31,7 @@ const Home = () => {
   const [state, setState] = useState(null);
   const [completion, setCompletion] = useState(null);
 
-  const dispatch = useDispatch();
+  const dispatch = useDispatch(); 
   useEffect(() => {
     if (!printerFetching && printerData) {
       const ready = printerData.state.flags.ready;

@@ -45,7 +45,7 @@ io.on("connection", (socket) => {
   // Handle ML model fault detection
   socket.on("fault_detected", async (data) => {
     console.log("Fault detected:", data);
-    printerState.faultDetected = true;
+   
 
     try {
       // Stop the print

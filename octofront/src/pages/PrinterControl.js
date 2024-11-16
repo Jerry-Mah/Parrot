@@ -36,6 +36,8 @@ async function startPrint(filename) {
   }
 }
 
+
+
 async function cancelPrint() {
   try {
     const response = await fetch(`${OCTOPRINT_URL}/api/job`, {

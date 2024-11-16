@@ -23,3 +23,4 @@ export const PrinterStatusAPI  = createApi({
 })
 
 export const {useCurrentPrinterStateQuery, useCurrentJobStateQuery} = PrinterStatusAPI;
+
