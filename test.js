@@ -186,8 +186,6 @@ async function startPrint(filename) {
 
 async function runTests() {
     clearPrintBed()
-
-
 }
 
 runTests();

@@ -21,7 +21,7 @@ except Exception as e:
     logger.error(f"Failed to connect to server: {e}")
 
 # Set up video capture (0 for webcam, or replace with video file path)
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 # Initialize last prompt time to 0
 last_prompt_time = 0

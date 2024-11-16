@@ -12,7 +12,7 @@ const PrinterTitle = () => {
         <h3 className='font-bold'>Ender 3 Pro</h3>
         <div className='flex items-center gap-2'>
         <MdOnlinePrediction/>
-        <h3>{ready ? "Online" : "Offline"}</h3>
+        <h3>{ready ? "Online" : "Not available"}</h3>
         </div>
         
     </div>

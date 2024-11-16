@@ -52,7 +52,6 @@ async function cancelPrint() {
 }
 async function pauseResumePrint(action) {
   try {
-  
     const response = await fetch(`${OCTOPRINT_URL}/api/job`, {
       method: "POST",
       headers: headers,
@@ -60,6 +59,7 @@ async function pauseResumePrint(action) {
         command: action, // "pause" or "resume"
       }),
     });
+    toast.success('Print Paused/Resumed');
 
     // Check if the response is okay
     if (response.ok) {
@@ -112,6 +112,7 @@ const PrinterControl = () => {
   const [tempDetails, setTempDetails] = useState(false);
   const [bedTemp, setBedTemp] = useState("");
   const [toolTemp, setToolTemp] = useState("");
+  const [pauseStatus, setPauseStatus] = useState("pause")
 
   const handleSubmit = async () => {
     // Log the current values
@@ -131,7 +132,15 @@ const PrinterControl = () => {
   return (
     <>
     {/* <Toast/> */}
+    
       <div class="grid grid-cols-2 gap-4 center">
+      <Button
+          onClick={() => startPrint("test.gcode")}
+          className="text-white flex justify-center items-center p-8 gap-2"
+        >
+          <h1 className="text-2xl font-bold">Start Print</h1>
+          <MdOutlineNotStarted size={50} />
+        </Button>
         <Button
           onClick={() => cancelPrint()}
           className="text-white flex justify-center items-center p-8 gap-2"
@@ -143,16 +152,10 @@ const PrinterControl = () => {
           onClick={() => pauseResumePrint("pause")}
           className="text-white flex justify-center items-center p-8 gap-2"
         >
-          <h1 className="text-2xl font-bold">Pause Print</h1>
+          <h1 className="text-2xl font-bold">Pause</h1>
           <FaPause size={50} />
         </Button>
-        <Button
-          onClick={() => startPrint("test.gcode")}
-          className="text-white flex justify-center items-center p-8 gap-2"
-        >
-          <h1 className="text-2xl font-bold">Start Print</h1>
-          <MdOutlineNotStarted size={50} />
-        </Button>
+       
         <Button
           onClick={() => {
             setTempDetails(!tempDetails);

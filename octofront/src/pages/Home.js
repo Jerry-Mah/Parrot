@@ -16,8 +16,13 @@ import { useDispatch } from "react-redux";
 import { setReady } from "../services/PrinterSlice";
 
 const Home = () => {
-  const { data: printerData, isfetching: printerFetching } =useCurrentPrinterStateQuery();
-  const { data: jobData, isfetching: jobFetching } = useCurrentJobStateQuery();
+  const { data: printerData, isFetching: printerFetching } = useCurrentPrinterStateQuery(undefined, {
+    pollingInterval: 3000, // Poll every 5 seconds
+  });
+  
+  const { data: jobData, isFetching: jobFetching } = useCurrentJobStateQuery(undefined, {
+    pollingInterval: 3000, // Poll every 5 seconds
+  });
 
   const [bedTemperatureActual, setBedTemperatureActual] = useState(null);
   const [tool0TemperatureActual, setTool0TemperatureActual] = useState(null);
