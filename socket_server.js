@@ -16,8 +16,8 @@ const io = new Server(server, {
 });
 
 // Port info
-const serialPortName = 'COM7';
-const serialport = new SerialPort({ path: serialPortName, baudRate: 9600 });
+// const serialPortName = 'COM7';
+// const serialport = new SerialPort({ path: serialPortName, baudRate: 9600 });
 
 // Configuration
 const OCTOPRINT_CONFIG = {
@@ -96,7 +96,7 @@ async function cancelPrint() {
 // Robot control functions
 async function clearPrintBed() {
   console.log("Clear plate command received");
-  serialport.write('1\n');
+  // serialport.write('1\n');
 }
 
 async function clearPrintBedCompletedPrint(status) {
